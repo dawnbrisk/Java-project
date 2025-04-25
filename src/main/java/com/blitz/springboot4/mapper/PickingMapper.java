@@ -9,30 +9,35 @@ import java.util.Map;
 @Mapper
 public interface PickingMapper {
 
-    @Select("SELECT \n" +
-            "    DATE_FORMAT(scan_time, '%Y-%m') AS month,\n" +
-            "    operator_account,\n" +
-            "    SUM(goods_quantity) AS total_quantity  \n" +
-            "FROM picking_list\n" +
-            "GROUP BY month, operator_account\n" +
-            "ORDER BY month DESC, total_quantity DESC")
-     List<Map<String,Object>> findAllPickings();
+    @Select("""
+    SELECT 
+        DATE_FORMAT(scan_time, '%Y-%m') AS month,
+        operator_account,
+        SUM(goods_quantity) AS total_quantity  
+    FROM picking_list
+    GROUP BY month, operator_account
+    ORDER BY month DESC, total_quantity DESC
+    """)
+    List<Map<String, Object>> findAllPickings();
 
 
 
-    @Select(
-            "SELECT\n" +
-                    "  operator_account AS username,\n" +
-                    "  DATE(scan_time) AS move_date,\n" +
-                    "  DATE_FORMAT(scan_time, '%Y-%m-%d %H:00:00') AS hour_slot,\n" +
-                    "  SUM(goods_quantity) AS move_count\n" +
-                    "FROM picking_list\n" +
-                    "WHERE operator_account = #{account}\n" +
-                    "  AND DATE_FORMAT(scan_time, '%Y-%m') = #{month}\n" +
-                    "  AND scan_time IS NOT NULL\n" +
-                    "GROUP BY operator_account, move_date, hour_slot\n" +
-                    "ORDER BY operator_account, move_date, hour_slot;\n")
-    List<Map<String,Object>> findPickingsByDay(String account,String month);
+
+    @Select("""
+    SELECT
+      operator_account AS username,
+      DATE(scan_time) AS move_date,
+      DATE_FORMAT(scan_time, '%Y-%m-%d %H:00:00') AS hour_slot,
+      SUM(goods_quantity) AS move_count
+    FROM picking_list
+    WHERE operator_account = #{account}
+      AND DATE_FORMAT(scan_time, '%Y-%m') = #{month}
+      AND scan_time IS NOT NULL
+    GROUP BY operator_account, move_date, hour_slot
+    ORDER BY operator_account, move_date, hour_slot
+    """)
+    List<Map<String, Object>> findPickingsByDay(String account, String month);
+
 
 
 

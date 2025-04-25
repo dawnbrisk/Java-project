@@ -29,8 +29,8 @@ public class OldestSkuService {
         String itemCodes = skus.stream()
                 .map(code -> "'" + code + "'")
                 .collect(Collectors.joining(","));
-        System.out.printf(itemCodes);
-
+                oldestSkuMapper.truncateDoubleWeeksCheck();
+                oldestSkuMapper.insertIntoDoubleWeeksCheck(itemCodes);
         return oldestSkuMapper.getDoubleCheckList(itemCodes);
     }
 

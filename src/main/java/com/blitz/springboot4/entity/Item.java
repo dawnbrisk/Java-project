@@ -9,7 +9,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @Entity
-
 @Table(name = "warehouse_items_newest")
 public class Item {
 
@@ -37,6 +36,20 @@ public class Item {
     @JsonProperty("In_Stock_Time")
     @Column(name = "In_Stock_Time", nullable = false)
     private String inStockTime;
+
+    @JsonProperty("Length")
+    @Column(name = "Length")
+    private int length;
+
+    @JsonProperty("Width")
+    @Column(name = "Width")
+    private int width;
+
+    @JsonProperty("Height")
+    @Column(name = "Height")
+    private int height;
+
+
 
     @PrePersist
     public void generateId() {
