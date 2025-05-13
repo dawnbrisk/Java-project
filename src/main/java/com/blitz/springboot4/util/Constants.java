@@ -11,4 +11,6 @@ public class Constants {
 
 
     public static final String ExceptionLocation  = "A-03-01-1"; //该库位特殊，不能参与计算
+
+
 }
