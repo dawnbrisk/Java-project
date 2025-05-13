@@ -39,7 +39,7 @@ public interface UpDownMoveMapper {
         LIMIT #{params.pageSize} OFFSET #{params.offset}
         """)
     List<UpDownMove> selectActionList(@Param("params") Map<String, Object> params);
-
+    //https://github.com/dawnbrisk/warehouse.git
     @Select("""
         SELECT username, fromLocation, toLocation, insert_time AS insertTime, location
         FROM up_down_move
