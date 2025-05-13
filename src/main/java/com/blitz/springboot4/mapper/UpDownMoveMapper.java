@@ -61,7 +61,6 @@ public interface UpDownMoveMapper {
     List<Map<String, Object>> updownDetail();
 
     @Select("""
-        WITH hourly_moves AS (
             SELECT
                 username,
                 DATE(insert_time) AS move_date,
@@ -74,27 +73,7 @@ public interface UpDownMoveMapper {
             ) AS up_down_move
             WHERE insert_time IS NOT NULL
             GROUP BY username, move_date, hour_slot
-        ),
-        min_hourly_moves AS (
-            SELECT
-                username,
-                move_date,
-                MIN(move_count) AS min_move_count
-            FROM hourly_moves
-            GROUP BY username, move_date
-        )
-        SELECT
-            h.username,
-            h.move_date,
-            h.hour_slot,
-            h.move_count
-        FROM hourly_moves h
-        LEFT JOIN min_hourly_moves m
-          ON h.username = m.username
-         AND h.move_date = m.move_date
-         AND h.move_count = m.min_move_count
-        WHERE m.username IS NULL
-        ORDER BY h.username, h.move_date, h.hour_slot
+     	order by username, move_date ,hour_slot
         """)
     List<Map<String, Object>> averageMovePerHour();
 }
