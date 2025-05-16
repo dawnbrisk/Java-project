@@ -129,4 +129,12 @@ public class LocationController {
         return Map.of("result","Success!");
 
     }
+
+    @GetMapping("/movePalletHistory")
+    @ResponseBody
+    public List<Map<String,Object>> movePalletHistory() {
+        return locationService.getMovingHistory();
+    }
+
+
 }

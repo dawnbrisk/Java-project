@@ -366,6 +366,9 @@ public class LocationService {
     }
 
 
+    public  List<Map<String,Object>> getMovingHistory() {
+        return locationMapper.getMovingHistory();
+    }
 }
 
 

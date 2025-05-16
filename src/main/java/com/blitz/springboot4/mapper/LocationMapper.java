@@ -200,4 +200,23 @@ public interface LocationMapper  {
     @Insert("insert into sku_bigpallet (first_location,second_location) values (#{location1},#{location2})")
     void insertBigPallet(String location1,String location2);
 
+    @Select("""
+            
+            SELECT
+                `user`,
+                DATE(insert_time) AS move_date,
+                SUM(pallet_count) AS total_pallets
+            FROM
+                moving_steps
+            WHERE
+                isFinish = 'Y'
+            		and  insert_time >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 2 MONTH), '%Y-%m-01')
+            GROUP BY
+                `user`,
+                DATE(insert_time)
+            ORDER BY
+                `user`,
+                move_date
+            """)
+    List<Map<String, Object>> getMovingHistory();
 }

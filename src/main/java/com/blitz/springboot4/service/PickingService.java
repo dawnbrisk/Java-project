@@ -123,7 +123,7 @@ public class PickingService {
 
                     if (totalGoods > 0) {
                         double avgThisSegment = (double) totalSeconds / totalGoods;
-                        System.out.println("operator: " + operator + " order: " + orderNumber + " totalSeconds: " + totalSeconds + " totalGoods: " + totalGoods);
+
                         totalAvg += avgThisSegment;
                         segmentCount++;
                     }
