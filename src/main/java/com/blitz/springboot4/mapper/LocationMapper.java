@@ -176,7 +176,7 @@ public interface LocationMapper  {
 
     @Select("SELECT  " +
             "    CASE  " +
-            "        WHEN MAX(sku_length) >= 120 THEN 'yes' " +
+            "        WHEN MAX(sku_length) >= #{maxLength} THEN 'yes' " +
             "        ELSE 'no' " +
             "    END AS result " +
             "FROM ( " +
@@ -190,7 +190,7 @@ public interface LocationMapper  {
             "WHERE " +
             "\tlocation_code = #{location}  " +
             "\t) c")
-    String getSku(String location);
+    String getSku(String location,int maxLength);
 
 
     @Insert("insert  ignore  into sku_skip values(#{sku},#{reasonType})")

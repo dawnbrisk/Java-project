@@ -5,6 +5,7 @@ import com.blitz.springboot4.entity.PrefixRange;
 import com.blitz.springboot4.entity.WarehouseLocation;
 import com.blitz.springboot4.mapper.LocationMapper;
 import com.blitz.springboot4.util.CommonUtils;
+import com.blitz.springboot4.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -256,11 +257,11 @@ public class LocationService {
                 parts[2] = String.format("%02d", (middle + 1)); // Format to two digits
                 String biggerLocation = String.join("-", parts);
 
-                String resultForBiggerSku = locationMapper.getSku(biggerLocation);
+                String resultForBiggerSku = locationMapper.getSku(biggerLocation, Constants.MaxLength);
                 //小于它的一边
                 parts[2] = String.format("%02d", (middle - 1)); // Format to two digits
                 String smallerLocation = String.join("-", parts);
-                String resultForSmallerSku = locationMapper.getSku(smallerLocation);
+                String resultForSmallerSku = locationMapper.getSku(smallerLocation, Constants.MaxLength);
 
                 if ("no".equals(resultForBiggerSku) && "no".equals(resultForSmallerSku)) {
                     locations.add(location);
@@ -274,7 +275,7 @@ public class LocationService {
                 parts[2] = String.format("%02d", (middle - 1)); // Format to two digits
                 String smallerLocation = String.join("-", parts);
 
-                String resultForSmallerSku = locationMapper.getSku(smallerLocation);
+                String resultForSmallerSku = locationMapper.getSku(smallerLocation, Constants.MaxLength);
                 if ("no".equals(resultForSmallerSku)) {
                     locations.add(location);
                 }
@@ -286,7 +287,7 @@ public class LocationService {
                 parts[2] = String.format("%02d", (middle + 1)); // Format to two digits
                 String biggerLocation = String.join("-", parts);
 
-                String resultForBiggerSku = locationMapper.getSku(biggerLocation);
+                String resultForBiggerSku = locationMapper.getSku(biggerLocation, Constants.MaxLength);
                 if ("no".equals(resultForBiggerSku)) {
                     locations.add(location);
                 }
@@ -311,7 +312,7 @@ public class LocationService {
         sortByLocationCode(warehouseLocations);
 
         String locationCode = warehouseLocations.get(0).getLocationCode();
-        String result = locationMapper.getSku(locationCode);
+        String result = locationMapper.getSku(locationCode, Constants.MaxLength);
         if ("no".equals(result)) {
             return;
         }
