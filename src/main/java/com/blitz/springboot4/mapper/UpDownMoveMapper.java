@@ -62,7 +62,7 @@ public interface UpDownMoveMapper {
 
     @Select("""
             SELECT
-                username,
+                trim(username),
                 DATE(insert_time) AS move_date,
                 DATE_FORMAT(insert_time, '%Y-%m-%d %H:00:00') AS hour_slot,
                 COUNT(*) AS move_count
@@ -72,8 +72,8 @@ public interface UpDownMoveMapper {
                 WHERE insert_time >= CURDATE() - INTERVAL 2 MONTH
             ) AS up_down_move
             WHERE insert_time IS NOT NULL
-            GROUP BY username, move_date, hour_slot
-     	order by username, move_date ,hour_slot
+            GROUP BY trim(username), move_date, hour_slot
+     	order by trim(username), move_date ,hour_slot
         """)
     List<Map<String, Object>> averageMovePerHour();
 }
