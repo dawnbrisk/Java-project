@@ -6,7 +6,9 @@ import com.blitz.springboot4.entity.WarehouseLocation;
 import com.blitz.springboot4.mapper.LocationMapper;
 import com.blitz.springboot4.util.CommonUtils;
 import com.blitz.springboot4.util.Constants;
+import com.blitz.springboot4.util.DeepCopyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,12 +72,7 @@ public class LocationService {
         //sku
         String sku = locations.get(0).getItemCode();
 
-
-        //current location insert
-        locations.forEach(location -> {
-            locationMapper.insertLocations(CommonUtils.generateUUID(), sku, location.getLocationCode(), location.getPalletNumber(), "0", "0");
-        });
-
+        List<WarehouseLocation> originLocations = DeepCopyUtil.deepCopyByClone(locations);
 
         Collections.sort(locations);
 
@@ -141,6 +138,11 @@ public class LocationService {
 
         if (i > 0) {
 
+            //current location insert
+            originLocations.forEach(location -> {
+                locationMapper.insertLocations(CommonUtils.generateUUID(), sku, location.getLocationCode(), location.getPalletNumber(), "0", "0","1");
+            });
+
             //steps
             steps.forEach(step -> {
                 locationMapper.insertSteps(CommonUtils.generateUUID(), sku, Integer.parseInt(step.get("palletNumber").toString()), step.get("fromLocation").toString(), step.get("toLocation").toString(), step.get("type").toString());
@@ -150,9 +152,9 @@ public class LocationService {
             for (WarehouseLocation location : locations) {
 
                 if (location.getPalletNumber() == 0) {
-                    locationMapper.insertLocations(CommonUtils.generateUUID(), sku, location.getLocationCode(), 0, "1", "1");
+                    locationMapper.insertLocations(CommonUtils.generateUUID(), sku, location.getLocationCode(), 0, "1", "1","1");
                 } else {
-                    locationMapper.insertLocations(CommonUtils.generateUUID(), sku, location.getLocationCode(), location.getPalletNumber(), "1", "0");
+                    locationMapper.insertLocations(CommonUtils.generateUUID(), sku, location.getLocationCode(), location.getPalletNumber(), "1", "0","1");
                 }
             }
         }
@@ -237,6 +239,7 @@ public class LocationService {
     }
 
 
+    @Cacheable(value = "emptyLocations", key = "'all'")
     public List<String> getEmptyLocation() {
         //work out and insert empty location : b-22-        -01
         List<Map<String, Object>> emptyLocation = locationMapper.EmptyLocation();

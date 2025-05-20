@@ -57,15 +57,15 @@ public class SinglePalletService {
 
                      //current location
                      //from
-                     locationMapper.insertLocations(CommonUtils.generateUUID(),current.get("item_code").toString(),current.get("location_code").toString(),1,"0","0");
+                     locationMapper.insertLocations(CommonUtils.generateUUID(),current.get("item_code").toString(),current.get("location_code").toString(),1,"0","0","2");
                      //to
                      int currentNum = Integer.parseInt(map.get("current_num").toString());
-                     locationMapper.insertLocations(CommonUtils.generateUUID(),current.get("item_code").toString(),map.get("location_code").toString(),currentNum,"0","0");
+                     locationMapper.insertLocations(CommonUtils.generateUUID(),current.get("item_code").toString(),map.get("location_code").toString(),currentNum,"0","0","2");
 
                      //expected location
                      //from
-                     locationMapper.insertLocations(CommonUtils.generateUUID(),current.get("item_code").toString(),current.get("location_code").toString(),0,"1","1");
-                     locationMapper.insertLocations(CommonUtils.generateUUID(),current.get("item_code").toString(),map.get("location_code").toString(),currentNum+1,"1","0");
+                     locationMapper.insertLocations(CommonUtils.generateUUID(),current.get("item_code").toString(),current.get("location_code").toString(),0,"1","1","2");
+                     locationMapper.insertLocations(CommonUtils.generateUUID(),current.get("item_code").toString(),map.get("location_code").toString(),currentNum+1,"1","0","2");
                      //steps
                      locationMapper.insertSteps(CommonUtils.generateUUID(),current.get("item_code").toString(),1,current.get("location_code").toString(),map.get("location_code").toString(),"2");
 
@@ -98,17 +98,16 @@ public class SinglePalletService {
                     .findFirst();
             result.ifPresent(map -> {
 
-
                     //current location
                     //过道
-                    locationMapper.insertLocations(CommonUtils.generateUUID(),entry.get("item_code").toString(),entry.get("fromLocation").toString(),1,"0","0");
+                    locationMapper.insertLocations(CommonUtils.generateUUID(),entry.get("item_code").toString(),entry.get("fromLocation").toString(),1,"0","0","3");
                     //普通
-                    locationMapper.insertLocations(CommonUtils.generateUUID(),entry.get("item_code").toString(),map.get("location_code").toString(),Integer.parseInt(map.get("current_num").toString()),"0","0");
+                    locationMapper.insertLocations(CommonUtils.generateUUID(),entry.get("item_code").toString(),map.get("location_code").toString(),Integer.parseInt(map.get("current_num").toString()),"0","0","3");
                     //expected location
                     //过道
-                    locationMapper.insertLocations(CommonUtils.generateUUID(),entry.get("item_code").toString(),entry.get("fromLocation").toString(),0,"1","1");
+                    locationMapper.insertLocations(CommonUtils.generateUUID(),entry.get("item_code").toString(),entry.get("fromLocation").toString(),0,"1","1","3");
                     //普通
-                    locationMapper.insertLocations(CommonUtils.generateUUID(),entry.get("item_code").toString(),map.get("location_code").toString(),Integer.parseInt(map.get("current_num").toString())+1,"1","0");
+                    locationMapper.insertLocations(CommonUtils.generateUUID(),entry.get("item_code").toString(),map.get("location_code").toString(),Integer.parseInt(map.get("current_num").toString())+1,"1","0","3");
                     //steps
                     locationMapper.insertSteps(CommonUtils.generateUUID(),entry.get("item_code").toString(),1,entry.get("fromLocation").toString(),map.get("location_code").toString(),"3");
                     int empty = Integer.parseInt(map.get("num").toString());

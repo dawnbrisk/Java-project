@@ -61,18 +61,14 @@ public class UpLoadExcelController {
             locationService.clear();//清空表
             locationService.mergeLocation();
 
-            //计算合并库位（把下面的往过道上移动）
+            //计算合并库位（从普通库位往过道库位移动）
             singlePalletService.insertAllEmptyLocationOnWay();
 
             //计算合并库位（把过道上的往同类移动）
             //这个功能可用，但先不用，因为在展示时没有与腾库位列表分开，易混淆。
-            //singlePalletService.InsertPalletInWay();
+            singlePalletService.InsertPalletInWay();
 
             //work mixing locations out
-
-
-
-
             map.put("status", "Upload successfully!");
         } catch (Exception e) {
             map.put("status", "Upload failed!");

@@ -238,4 +238,9 @@ public class MergePalletService {
         return mergeMapper.getAllSteps(params);
     }
 
+
+    public List<Map<String,Object>> getMergeStepsByUser(){
+        return mergeMapper.getMergeStepsByUser();
+    }
+
 }

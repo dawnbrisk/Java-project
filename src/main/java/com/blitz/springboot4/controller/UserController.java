@@ -27,7 +27,7 @@ public class UserController {
         Map<String, Object> response = new HashMap<>();
 
 
-        if (userService.getUserName(user.getUsername().trim(), user.getPassword()) == 1) {
+        if (userService.getUserName(user.getUsername(), user.getPassword()) == 1) {
             response.put("message", "Success");
             return ResponseEntity.ok(response);
         }

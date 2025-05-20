@@ -104,4 +104,25 @@ public interface MergeMapper  {
 
 
 
+    @Select("""
+         
+            SELECT\s
+           `user`,
+           DATE(`update_time`) AS `date`,
+           COUNT(*) AS `finish_count`
+         FROM\s
+           `merge_steps`
+         WHERE\s
+           `is_finish` = 'Y'
+           AND `user` IS NOT NULL
+           AND TRIM(`user`) != ''
+           AND `update_time` >= CURDATE() - INTERVAL 2 MONTH
+         GROUP BY\s
+           `user`, DATE(`update_time`)
+         ORDER BY\s
+           `date` DESC, `user`;
+         
+            """)
+    List<Map<String, Object>> getMergeStepsByUser();
+
 }

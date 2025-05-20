@@ -62,7 +62,7 @@ public interface UpDownMoveMapper {
 
     @Select("""
             SELECT
-                trim(username),
+                trim(username) as username,
                 DATE(insert_time) AS move_date,
                 DATE_FORMAT(insert_time, '%Y-%m-%d %H:00:00') AS hour_slot,
                 COUNT(*) AS move_count

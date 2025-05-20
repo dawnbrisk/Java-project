@@ -74,4 +74,11 @@ public class MergeController {
     }
 
 
+    @GetMapping("/getMergePalletHistory")
+    @ResponseBody
+    public List<Map<String,Object>> getMergePalletHistory() {
+        return mergePalletService.getMergeStepsByUser();
+    }
+
+
 }

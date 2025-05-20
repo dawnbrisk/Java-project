@@ -12,44 +12,42 @@ import java.util.List;
 import java.util.Map;
 
 @Mapper
-public interface LocationMapper  {
+public interface LocationMapper {
 
 
-
-
-        @Select("SELECT  " +
-                "    a.locationCode, " +
-                "    b.Item_Code AS ItemCode, " +
-                "    a.palletNumber " +
-                "FROM  " +
-                "    ( " +
-                "        SELECT  " +
-                "            Location_Code AS locationCode, " +
-                "            COUNT(Item_Code) AS palletNumber " +
-                "        FROM  " +
-                "           warehouse_items_newest m  " +
-                "      LEFT JOIN locations n on m.Location_Code = n.location " +
-                "        WHERE  " +
-                "           n.type = '0' " +
-                "        GROUP BY  " +
-                "            Location_Code " +
-                "        HAVING  " +
-                "            COUNT(Item_Code) < 5 " +
-                "    ) AS a " +
-                "LEFT JOIN  " +
-                "    ( " +
-                "        SELECT DISTINCT  " +
-                "            Item_Code,  " +
-                "            Location_Code  " +
-                "        FROM  " +
-                "            warehouse_items_newest " +
-                "        ORDER BY  " +
-                "            Item_Code " +
-                "    ) AS b  " +
-                "    ON a.locationCode = b.Location_Code " +
-                "ORDER BY  " +
-                "    ItemCode")
-        List<WarehouseLocation> selectBySomeColumn();
+    @Select("SELECT  " +
+            "    a.locationCode, " +
+            "    b.Item_Code AS ItemCode, " +
+            "    a.palletNumber " +
+            "FROM  " +
+            "    ( " +
+            "        SELECT  " +
+            "            Location_Code AS locationCode, " +
+            "            COUNT(Item_Code) AS palletNumber " +
+            "        FROM  " +
+            "           warehouse_items_newest m  " +
+            "      LEFT JOIN locations n on m.Location_Code = n.location " +
+            "        WHERE  " +
+            "           n.type = '0' " +
+            "        GROUP BY  " +
+            "            Location_Code " +
+            "        HAVING  " +
+            "            COUNT(Item_Code) < 5 " +
+            "    ) AS a " +
+            "LEFT JOIN  " +
+            "    ( " +
+            "        SELECT DISTINCT  " +
+            "            Item_Code,  " +
+            "            Location_Code  " +
+            "        FROM  " +
+            "            warehouse_items_newest " +
+            "        ORDER BY  " +
+            "            Item_Code " +
+            "    ) AS b  " +
+            "    ON a.locationCode = b.Location_Code " +
+            "ORDER BY  " +
+            "    ItemCode")
+    List<WarehouseLocation> selectBySomeColumn();
 
     @Select("SELECT Location_Code,COUNT(DISTINCT Item_Code) as uniqueSkuCount," +
             "  GROUP_CONCAT(DISTINCT item_code) as sku    " +
@@ -64,13 +62,11 @@ public interface LocationMapper  {
     @Select("SELECT location_code,(b.max_number - count(*)) as empty_num  ,count(*) as current_num    " +
             "from warehouse_items_newest a LEFT JOIN locations b on a.Location_Code = b.location  " +
             "WHERE b.type = 1 GROUP BY a.Location_Code HAVING empty_num > 0 ORDER BY location_code ")
-    List<Map<String,Object>> getEmptyLocation();
-
+    List<Map<String, Object>> getEmptyLocation();
 
 
     @Select("SELECT COUNT(*) FROM moving_steps WHERE sku = #{item_code} AND pallet_count = 1 AND from_location = #{location_code} AND isDelete IS NULL")
     int isExist(Map<String, Object> map);
-
 
 
     @Select("SELECT m.*,n.item_code from ( " +
@@ -84,44 +80,79 @@ public interface LocationMapper  {
     int isBigPallet(String location);
 
 
-    @Select("SELECT  item_code,location_code as fromLocation FROM warehouse_items_newest a LEFT JOIN locations b on a.location_code = b.location where b.type =1 GROUP BY item_code, location " +
-            "HAVING COUNT(*) = 1")
-    List<Map<String,Object>> getPalletInWay();
+    @Select("""
+            	SELECT
+                item_code,
+                location_code AS fromLocation
+            FROM
+                warehouse_items_newest a
+                LEFT JOIN locations b ON a.location_code = b.location
+            WHERE
+                b.type = 1
+                AND item_code IN (
+                    SELECT item_code
+                    FROM warehouse_items_newest a
+                    LEFT JOIN locations b ON a.location_code = b.location
+                    WHERE b.type = 1
+                    GROUP BY item_code
+                    HAVING COUNT(*) = 1
+                );
+            """)
+    List<Map<String, Object>> getPalletInWay();
 
-    @Select("   SELECT " +
-            "      a.*,b.item_code  " +
-            "   FROM " +
-            "      ( " +
-            "      SELECT k.*,j.current_num from ( " +
-            "      SELECT " +
-            "         location_code,(n.max_number - count(*)) AS num  " +
-            "      FROM " +
-            "         warehouse_items_newest m " +
-            "         LEFT JOIN locations n ON m.Location_Code = n.location  " +
-            "      WHERE " +
-            "         n.type = 0  " +
-            "      GROUP BY " +
-            "         Location_Code  " +
-            "         ) k LEFT JOIN ( " +
-            "         SELECT location_code,count(*) as current_num from warehouse_items_newest GROUP BY Location_Code ) j on k.location_code = j.location_code " +
-            "          " +
-            "      ) a " +
-            "      LEFT JOIN ( SELECT MIN( item_code ) AS item_code, location_code FROM warehouse_items_newest GROUP BY location_code ) b ON a.location_code = b.Location_Code  " +
-            "   WHERE " +
-            "      num > 0 and num < 4  " +
-            "   ORDER BY " +
-            "      a.location_code ")
-    List<Map<String,Object>> getGeneralLocation();
-
-
+    @Select("""
+                SELECT 
+                    a.*, b.item_code
+                FROM (
+                    SELECT 
+                        k.*, j.current_num 
+                    FROM (
+                        SELECT 
+                            location_code, 
+                            (n.max_number - COUNT(*)) AS num  
+                        FROM 
+                            warehouse_items_newest m
+                            LEFT JOIN locations n ON m.Location_Code = n.location  
+                        WHERE 
+                            n.type = 0  
+                        GROUP BY 
+                            location_code
+                    ) k 
+                    LEFT JOIN (
+                        SELECT 
+                            location_code, 
+                            COUNT(*) AS current_num 
+                        FROM 
+                            warehouse_items_newest 
+                        GROUP BY 
+                            location_code
+                    ) j ON k.location_code = j.location_code
+                ) a 
+                LEFT JOIN (
+                    SELECT 
+                        MIN(item_code) AS item_code, 
+                        location_code 
+                    FROM 
+                        warehouse_items_newest 
+                    GROUP BY 
+                        location_code
+                ) b ON a.location_code = b.location_code
+                WHERE 
+                    num > 0 
+                    AND num < 4  
+                ORDER BY 
+                    a.location_code
+            """)
+    List<Map<String, Object>> getGeneralLocation();
 
 
     @Insert("insert into moving_steps (id,sku, pallet_count, from_location, to_location, type,insert_time) " +
             "values (#{id},#{sku}, #{pallet_count}, #{from_location}, #{to_location}, #{type},NOW())")
-    void insertSteps(String id,String sku,int pallet_count,String from_location,String to_location,String type);
+    void insertSteps(String id, String sku, int pallet_count, String from_location, String to_location, String type);
 
-    @Insert("insert into sku_location (id,sku, location,pallet_qty, insert_time,location_type, isTick) values (#{id},#{sku}, #{location}, #{qty}, now(3),#{location_type}, #{isTick})")
-    void insertLocations(String id,String sku,String location,int qty,String location_type,String isTick);
+    @Insert("insert into sku_location (id,sku, location,pallet_qty, insert_time,location_type, isTick,type) " +
+            "values (#{id},#{sku}, #{location}, #{qty}, now(3),#{location_type}, #{isTick},#{type})")
+    void insertLocations(String id, String sku, String location, int qty, String location_type, String isTick,String type);
 
     @Update("update sku_location set isDelete = 1")
     void deleteLocations();
@@ -131,36 +162,36 @@ public interface LocationMapper  {
 
 
     @Select("select * from sku_location where sku = #{sku} and isDelete is null ")
-    List<Map<String,Object>> getLocationListBySku(String sku);
+    List<Map<String, Object>> getLocationListBySku(String sku);
 
     @Select("select * from moving_steps where sku = #{sku} and isDelete is null")
-    List<Map<String,Object>> getStepsBySku(String sku);
-
+    List<Map<String, Object>> getStepsBySku(String sku);
 
 
     @Update("update moving_steps  set isFinish = #{isFinish}, update_time = now(),user = #{username} where id = #{id}")
-    void updateSteps(String id,String isFinish,String username);
+    void updateSteps(String id, String isFinish, String username);
 
     @Update("update sku_location  set isFinish = #{isFinish}, finish_time = now() ,user = #{username} where id = #{id}")
-    void updateLocation(String id,String isFinish,String username);
+    void updateLocation(String id, String isFinish, String username);
 
-    @Select("SELECT m.sku, MAX(insert_time) AS max_insert_time " +
-            "FROM sku_location  m LEFT JOIN sku_skip n  on m.sku = n.sku  " +
-            "WHERE location_type = '1'   AND isTick = '1'    AND isFinish IS NULL     AND isdelete IS NULL     and n.sku is null  " +
-            "GROUP BY sku  ORDER BY max_insert_time ASC  ")
-    List<Map<String,Object>> getAllLocations();
+    @Select(""" 
+            SELECT m.sku, MAX(insert_time) AS max_insert_time 
+            FROM sku_location  m LEFT JOIN sku_skip n  on m.sku = n.sku  
+            WHERE location_type = '1'   AND isTick = '1'    AND isFinish IS NULL     AND isdelete IS NULL     and n.sku is null  
+            GROUP BY sku  ORDER BY max_insert_time ASC  
+            """)
+    List<Map<String, Object>> getAllLocations();
 
 
     @Select("SELECT sku, MAX(finish_time) AS max_finish_time    " +
             "FROM sku_location  where location_type = '1' and isTick = '1' and isFinish is  not null and DATE(finish_time) = CURDATE()  and user = #{name} " +
             "GROUP BY sku    " +
             "ORDER BY max_finish_time desc")
-    List<Map<String,Object>> getHistory(String name);
+    List<Map<String, Object>> getHistory(String name);
 
 
     @Select("SELECT * from moving_steps where isFinish is not null  ${name} ${dateRange}   ORDER BY update_time desc")
-    List<Map<String,Object>> getAllSteps(Map<String,Object> map);
-
+    List<Map<String, Object>> getAllSteps(Map<String, Object> map);
 
 
     @Select("SELECT location , CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(location, '-', 3), '-', -1) AS UNSIGNED)  % 3  AS group_number     " +
@@ -170,8 +201,7 @@ public interface LocationMapper  {
             "WHERE b.Location_Code IS NULL    " +
             "and a.type = '0'    " +
             "ORDER BY location")
-    List<Map<String,Object>> EmptyLocation();
-
+    List<Map<String, Object>> EmptyLocation();
 
 
     @Select("SELECT  " +
@@ -190,15 +220,15 @@ public interface LocationMapper  {
             "WHERE " +
             "\tlocation_code = #{location}  " +
             "\t) c")
-    String getSku(String location,int maxLength);
+    String getSku(String location, int maxLength);
 
 
     @Insert("insert  ignore  into sku_skip values(#{sku},#{reasonType})")
-    void insetSkipSku(String sku,String reasonType);
+    void insetSkipSku(String sku, String reasonType);
 
 
     @Insert("insert into sku_bigpallet (first_location,second_location) values (#{location1},#{location2})")
-    void insertBigPallet(String location1,String location2);
+    void insertBigPallet(String location1, String location2);
 
     @Select("""
             
