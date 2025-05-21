@@ -178,7 +178,7 @@ public interface LocationMapper {
             SELECT m.sku, MAX(insert_time) AS max_insert_time 
             FROM sku_location  m LEFT JOIN sku_skip n  on m.sku = n.sku  
             WHERE location_type = '1'   AND isTick = '1'    AND isFinish IS NULL     AND isdelete IS NULL     and n.sku is null  
-            GROUP BY sku  ORDER BY max_insert_time ASC  
+            GROUP BY sku  ORDER BY max_insert_time DESC  
             """)
     List<Map<String, Object>> getAllLocations();
 
@@ -234,16 +234,16 @@ public interface LocationMapper {
             
             SELECT
                 `user`,
-                DATE(insert_time) AS move_date,
+                DATE(update_time) AS move_date,
                 SUM(pallet_count) AS total_pallets
             FROM
                 moving_steps
             WHERE
                 isFinish = 'Y'
-            		and  insert_time >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 2 MONTH), '%Y-%m-01')
+            		and  update_time >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 2 MONTH), '%Y-%m-01')
             GROUP BY
                 `user`,
-                DATE(insert_time)
+                DATE(update_time)
             ORDER BY
                 `user`,
                 move_date
