@@ -106,20 +106,20 @@ public interface MergeMapper  {
 
     @Select("""
          
-            SELECT\s
+            SELECT
            `user`,
            DATE(`update_time`) AS `date`,
            COUNT(*) AS `finish_count`
-         FROM\s
+         FROM
            `merge_steps`
-         WHERE\s
+         WHERE
            `is_finish` = 'Y'
            AND `user` IS NOT NULL
            AND TRIM(`user`) != ''
            AND `update_time` >= CURDATE() - INTERVAL 2 MONTH
-         GROUP BY\s
+         GROUP BY
            `user`, DATE(`update_time`)
-         ORDER BY\s
+         ORDER BY
            `date` DESC, `user`;
          
             """)

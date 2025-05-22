@@ -49,14 +49,28 @@ public interface LocationMapper {
             "    ItemCode")
     List<WarehouseLocation> selectBySomeColumn();
 
-    @Select("SELECT Location_Code,COUNT(DISTINCT Item_Code) as uniqueSkuCount," +
-            "  GROUP_CONCAT(DISTINCT item_code) as sku    " +
-            "from warehouse_items_newest a    " +
-            "LEFT JOIN locations b on a.Location_Code = b.location     " +
-            "where b.type = '0' " +
-            "GROUP BY Location_Code " +
-            "HAVING COUNT(DISTINCT Item_Code) > 1")
+    @Select("""
+            
+                SELECT
+                a.Location_Code,
+                a.item_code as sku ,
+                COUNT(DISTINCT a.Pallet_Code) AS uniqueSkuCount
+            FROM warehouse_items_newest a
+            JOIN locations b ON a.Location_Code = b.location
+            WHERE b.type = '0'
+            GROUP BY a.Location_Code, a.item_code
+            HAVING a.Location_Code IN (
+                SELECT Location_Code
+                FROM warehouse_items_newest a2
+                JOIN locations b2 ON a2.Location_Code = b2.location
+                WHERE b2.type = '0'
+                GROUP BY a2.Location_Code
+                HAVING COUNT(DISTINCT a2.item_code) > 1
+            )
+            ORDER BY a.Location_Code, a.item_code;
+            """)
     List<Map<String, Object>> findMixingLocation();
+
 
 
     @Select("SELECT location_code,(b.max_number - count(*)) as empty_num  ,count(*) as current_num    " +

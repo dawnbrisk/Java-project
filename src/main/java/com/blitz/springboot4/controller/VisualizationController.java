@@ -2,7 +2,6 @@ package com.blitz.springboot4.controller;
 
 import com.blitz.springboot4.service.VisualizationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = "*")
 @RestController
 public class VisualizationController {
 

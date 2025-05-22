@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 
 
-@CrossOrigin(origins = "*")
+
 @Controller
 public class LocationController {
 

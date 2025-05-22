@@ -1,40 +1,62 @@
 package com.blitz.springboot4.controller;
 
-
-import com.blitz.springboot4.entity.User;
-import com.blitz.springboot4.entity.UserCreateDTO;
 import com.blitz.springboot4.entity.UserDTO;
 import com.blitz.springboot4.service.UserService;
-import jakarta.validation.Valid;
+import com.blitz.springboot4.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = "*")
 @RestController
 public class UserController {
 
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private AuthenticationManager authManager;
+
+    @Autowired
+    private JwtTokenUtil jwtUtil;
+
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody User user) {
-        Map<String, Object> response = new HashMap<>();
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
+        String username = loginData.get("username");
+        String password = loginData.get("password");
 
+        Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
-        if (userService.getUserName(user.getUsername(), user.getPassword()) == 1) {
-            response.put("message", "Success");
-            return ResponseEntity.ok(response);
-        }
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        String token = jwtUtil.generateToken(userDetails);
 
-        response.put("message", "Failed");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(Map.of("token", token));
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<String> me() {
+        return ResponseEntity.ok(SecurityContextHolder.getContext().getAuthentication().getName());
+    }
+//    @PostMapping("/login")
+//    public ResponseEntity<Map<String, Object>> login(@RequestBody User user) {
+//        Map<String, Object> response = new HashMap<>();
+//
+//
+//        if (userService.getUserName(user.getUsername(), user.getPassword()) == 1) {
+//            response.put("message", "Success");
+//            return ResponseEntity.ok(response);
+//        }
+//
+//        response.put("message", "Failed");
+//        return ResponseEntity.ok(response);
+//    }
 
 
     @GetMapping("/getDate")
