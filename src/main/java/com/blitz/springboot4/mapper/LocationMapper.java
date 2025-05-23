@@ -72,7 +72,6 @@ public interface LocationMapper {
     List<Map<String, Object>> findMixingLocation();
 
 
-
     @Select("SELECT location_code,(b.max_number - count(*)) as empty_num  ,count(*) as current_num    " +
             "from warehouse_items_newest a LEFT JOIN locations b on a.Location_Code = b.location  " +
             "WHERE b.type = 1 GROUP BY a.Location_Code HAVING empty_num > 0 ORDER BY location_code ")
@@ -166,7 +165,7 @@ public interface LocationMapper {
 
     @Insert("insert into sku_location (id,sku, location,pallet_qty, insert_time,location_type, isTick,type) " +
             "values (#{id},#{sku}, #{location}, #{qty}, now(3),#{location_type}, #{isTick},#{type})")
-    void insertLocations(String id, String sku, String location, int qty, String location_type, String isTick,String type);
+    void insertLocations(String id, String sku, String location, int qty, String location_type, String isTick, String type);
 
     @Update("update sku_location set isDelete = 1")
     void deleteLocations();
@@ -218,22 +217,22 @@ public interface LocationMapper {
     List<Map<String, Object>> EmptyLocation();
 
 
-    @Select("SELECT  " +
-            "    CASE  " +
-            "        WHEN MAX(sku_length) >= #{maxLength} THEN 'yes' " +
-            "        ELSE 'no' " +
-            "    END AS result " +
-            "FROM ( " +
-            "  " +
-            "SELECT " +
-            "\titem_code,b.sku_length " +
-            "FROM " +
-            "\twarehouse_items_newest a " +
-            "\tLEFT JOIN sku_size b " +
-            "\ton a.item_code = b.sku  " +
-            "WHERE " +
-            "\tlocation_code = #{location}  " +
-            "\t) c")
+    @Select("""
+            SELECT  
+                CASE  
+                    WHEN MAX(sku_length) >= #{maxLength} THEN 'yes' 
+                    ELSE 'no' 
+                END AS result 
+            FROM ( 
+                SELECT 
+                    item_code, length as sku_length 
+                FROM 
+                    warehouse_items_newest 
+                
+                WHERE 
+                    location_code = #{location}  
+            ) c
+            """)
     String getSku(String location, int maxLength);
 
 
