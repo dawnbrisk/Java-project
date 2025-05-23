@@ -2,13 +2,13 @@ package com.blitz.springboot4.controller;
 
 import com.blitz.springboot4.entity.UserDTO;
 import com.blitz.springboot4.service.UserService;
+import com.blitz.springboot4.util.ApiResponse;
 import com.blitz.springboot4.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
@@ -32,31 +32,14 @@ public class UserController {
         String username = loginData.get("username");
         String password = loginData.get("password");
 
+        // 尝试认证（会调用 UserDetailsService）
         Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
         String token = jwtUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(Map.of("token", token));
+        return ResponseEntity.ok(ApiResponse.success(token));
     }
-
-    @GetMapping("/me")
-    public ResponseEntity<String> me() {
-        return ResponseEntity.ok(SecurityContextHolder.getContext().getAuthentication().getName());
-    }
-//    @PostMapping("/login")
-//    public ResponseEntity<Map<String, Object>> login(@RequestBody User user) {
-//        Map<String, Object> response = new HashMap<>();
-//
-//
-//        if (userService.getUserName(user.getUsername(), user.getPassword()) == 1) {
-//            response.put("message", "Success");
-//            return ResponseEntity.ok(response);
-//        }
-//
-//        response.put("message", "Failed");
-//        return ResponseEntity.ok(response);
-//    }
 
 
     @GetMapping("/getDate")
@@ -114,9 +97,7 @@ public class UserController {
      */
 //
     @PostMapping("/users/{userId}")
-    public Map updateUser(
-            @PathVariable Long userId,
-             @RequestBody Map<String,Object> userData) {
+    public Map updateUser(@PathVariable Long userId, @RequestBody Map<String,Object> userData) {
          userService.updateUser(userId, userData);
         return Map.of();
     }
