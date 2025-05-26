@@ -1,25 +1,27 @@
 package com.blitz.springboot4.controller;
 
+import com.blitz.springboot4.util.ApiResponse;
 import org.apache.ibatis.annotations.Param;
 import com.blitz.springboot4.service.OldestSkuService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
 
 
-@Controller
+@RestController
 public class OldestSkuController {
 
     @Autowired
     private OldestSkuService oldestSkuService;
 
     @GetMapping("/getOldestSku")
-    @ResponseBody
-    public List<Map<String,Object>> getOldestSku(@Param("type") String type){
-        return oldestSkuService.getOldestSku(type);
+    public ResponseEntity<?> getOldestSku(@Param("type") String type){
+        return ResponseEntity.ok(ApiResponse.success(oldestSkuService.getOldestSku(type)));
     }
 }

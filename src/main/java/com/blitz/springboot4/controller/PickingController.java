@@ -2,12 +2,10 @@ package com.blitz.springboot4.controller;
 
 
 import com.blitz.springboot4.service.PickingService;
+import com.blitz.springboot4.util.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
-
 
 @RestController
 @RequestMapping
@@ -18,23 +16,20 @@ public class PickingController {
     private PickingService pickingService;
 
     @GetMapping("/picking_detail")
-    @ResponseBody
-    public List<Map<String,Object>> pickingDetail() {
-        return pickingService.getAllPickingHistory();
+    public ResponseEntity<?> pickingDetail() {
+        return ResponseEntity.ok(ApiResponse.success(pickingService.getAllPickingHistory()));
     }
 
 
     @GetMapping("/pickingByAccount")
-    @ResponseBody
-    public List<Map<String,Object>> pickingByAccount(@RequestParam("month") String month,
+    public ResponseEntity<?> pickingByAccount(@RequestParam("month") String month,
                                                      @RequestParam("account") String account) {
-        return pickingService.getPickingHistoryByDay(account,month);
+        return ResponseEntity.ok(ApiResponse.success(pickingService.getPickingHistoryByDay(account,month)));
     }
 
     @GetMapping("/averageInterval")
-    @ResponseBody
-    public Map<String, Map<String, Double>> average(){
-       return pickingService.getPickingHistoryByAccount();
+    public ResponseEntity<?> average(){
+       return ResponseEntity.ok(ApiResponse.success(pickingService.getPickingHistoryByAccount()));
 
     }
 }

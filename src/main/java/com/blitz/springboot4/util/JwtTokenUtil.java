@@ -13,7 +13,7 @@ public class JwtTokenUtil {
     private static final String SECRET_KEY = "yourverylongsecretkeyatleast32charslong123456123456789";
 
     // 有效期：10 小时
-    private static final long EXPIRATION_TIME = 60 * 60 * 1000;
+    private static final long EXPIRATION_TIME = 10 * 60 * 60 * 1000;
 
     public String generateToken(UserDetails userDetails) {
         return Jwts.builder()

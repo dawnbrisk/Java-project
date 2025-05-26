@@ -204,12 +204,20 @@ public class LocationService {
     }
 
 
-    public List<Map<String, Object>> getAllLocations() {
-        return locationMapper.getAllLocations();
+    public List<String> getAllLocations() {
+        return locationMapper.getAllLocations().stream()
+                .map(map -> map.get("sku"))
+                .filter(Objects::nonNull)
+                .map(Object::toString)
+                .toList();
     }
 
-    public List<Map<String, Object>> getHistory(String name) {
-        return locationMapper.getHistory(name);
+    public List<String> getHistory(String name) {
+        return locationMapper.getHistory(name).stream()
+                .map(map -> map.get("sku"))
+                .filter(Objects::nonNull)
+                .map(Object::toString)
+                .toList();
     }
 
 

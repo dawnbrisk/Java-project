@@ -3,7 +3,9 @@ package com.blitz.springboot4.controller;
 
 import com.blitz.springboot4.service.LocationService;
 import com.blitz.springboot4.service.LocationServicePlus;
+import com.blitz.springboot4.util.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +16,7 @@ import java.util.Objects;
 
 
 
-@Controller
+@RestController
 public class LocationController {
 
     @Autowired
@@ -23,117 +25,89 @@ public class LocationController {
     @Autowired
     private LocationServicePlus locationServicePlus;
 
-
-
-
     @GetMapping("/longLocation")
-    @ResponseBody
     public List<Map<String, Object>> getLongLocationList() {
         return locationServicePlus.findAll();
     }
 
     @GetMapping("/mixingLocation")
-    @ResponseBody
-    public List<Map<String, Object>> getMixingLocation() {
-        return locationService.findMixingLocation();
+    public ResponseEntity<?> getMixingLocation() {
+        return ResponseEntity.ok(ApiResponse.success(locationService.findMixingLocation()));
     }
 
     @GetMapping("/locationList")
-    @ResponseBody
-    public List<String> locationList() {
-        List<Map<String, Object>> locationList = locationService.getAllLocations();
+    public ResponseEntity<?> locationList() {
+        List<String> locationList = locationService.getAllLocations();
 
-        return locationList.stream()
-                .map(map -> map.get("sku"))
-                .filter(Objects::nonNull)
-                .map(Object::toString)
-                .toList();
+        return ResponseEntity.ok(ApiResponse.success(locationList));
     }
 
     @GetMapping("/getNext")
-    @ResponseBody
-    public Map<String,String> getNext() {
-        List<Map<String, Object>> locationList = locationService.getAllLocations();
-
-        String nextSku =  locationList.stream()
-                .map(map -> map.get("sku"))
-                .filter(Objects::nonNull)
-                .map(Object::toString)
-                .toList().get(0);
+    public ResponseEntity<?> getNext() {
+        String nextSku = locationService.getAllLocations().get(0);
 
         Map<String,String> map = new HashMap<>();
         map.put("sku",nextSku);
-        return map;
+        return ResponseEntity.ok(ApiResponse.success(map));
     }
 
 
     @PostMapping("/history")
-    @ResponseBody
-    public List<String> getHistory(@RequestBody Map<String,Object> params) {
-        List<Map<String, Object>> locationList = locationService.getHistory(params.get("username").toString());
+    public ResponseEntity<?> getHistory(@RequestBody Map<String,Object> params) {
+        List<String> locationList = locationService.getHistory(params.get("username").toString());
 
-        return locationList.stream()
-                .map(map -> map.get("sku"))
-                .filter(Objects::nonNull)
-                .map(Object::toString)
-                .toList();
+        return ResponseEntity.ok(ApiResponse.success(locationList));
     }
 
 
 
 
-    @ResponseBody
     @GetMapping("/skuDetail/{sku}")  // 使用 @PathVariable 获取 sku
-    public Map<String, Object> getLocationListBySku(@PathVariable String sku) {
+    public ResponseEntity<?> getLocationListBySku(@PathVariable String sku) {
 
-        return locationService.getLocationListBySku(sku);  // 根据 sku 查询数据
+        return ResponseEntity.ok(ApiResponse.success(locationService.getLocationListBySku(sku)));  // 根据 sku 查询数据
     }
 
 
     @PostMapping("/updateFinish")
-    @ResponseBody
-    public Map<String, Object> updateFinish(@RequestBody Map<String, Map<String, String>> params) {
+    public ResponseEntity<?> updateFinish(@RequestBody Map<String, Map<String, String>> params) {
         locationService.updateFinish(params);
         Map<String, Object> map = new HashMap<>();
         map.put("result", "Success!");
 
-        return map;
+        return ResponseEntity.ok(ApiResponse.success(map));
     }
 
 
     @PostMapping("/getAllSteps")
-    @ResponseBody
-    public List<Map<String, Object>> getAllSteps(@RequestBody Map<String,Object> params) {
+    public ResponseEntity<?> getAllSteps(@RequestBody Map<String,Object> params) {
        try {
-           return locationService.getAllSteps(params);
+           return ResponseEntity.ok(ApiResponse.success(locationService.getAllSteps(params)));
        }catch (Exception e){
            e.printStackTrace();
-           return List.of();
+           return ResponseEntity.ok(ApiResponse.success(List.of()));
        }
 
     }
 
 
     @GetMapping("/emptyLocationList")
-    @ResponseBody
-    public List<String> emptyLocationList() {
-        return locationService.getEmptyLocation();
+    public ResponseEntity<?> emptyLocationList() {
+        return ResponseEntity.ok(ApiResponse.success(locationService.getEmptyLocation()));
     }
 
 
     @PostMapping("/skip")
-    @ResponseBody
-    public Map<String,String> skip(@RequestBody Map<String,String> params) {
+    public ResponseEntity<?> skip(@RequestBody Map<String,String> params) {
 
         locationService.skip(params.get("reasonType"),params.get("sku"));
-        return Map.of("result","Success!");
+        return ResponseEntity.ok(ApiResponse.success(Map.of("result","Success!")));
 
     }
 
     @GetMapping("/movePalletHistory")
-    @ResponseBody
-    public List<Map<String,Object>> movePalletHistory() {
-        return locationService.getMovingHistory();
+    public ResponseEntity<?> movePalletHistory() {
+        return ResponseEntity.ok(ApiResponse.success(locationService.getMovingHistory()));
     }
 
 

@@ -8,16 +8,18 @@ import com.blitz.springboot4.service.LocationService;
 import com.blitz.springboot4.service.MergePalletService;
 import com.blitz.springboot4.service.OldestSkuService;
 import com.blitz.springboot4.service.SinglePalletService;
+import com.blitz.springboot4.util.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -40,12 +42,12 @@ public class UpLoadExcelController {
     private SinglePalletService singlePalletService;
 
     @Autowired
-    private OldestSkuService    oldestSkuService;
+    private OldestSkuService oldestSkuService;
 
 
     @PostMapping("/upload")
     @Transactional
-    public ResponseEntity<Map<String, Object>> uploadWarehouseItems(@RequestBody List<Item> items) {
+    public ResponseEntity<?> uploadWarehouseItems(@RequestBody List<Item> items) {
 
         Map<String, Object> map = new HashMap<>();
         try {
@@ -77,39 +79,32 @@ public class UpLoadExcelController {
         }
 
 
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(ApiResponse.success(map));
     }
 
     @PostMapping("/uploadPickingList")
     @Transactional
-    public ResponseEntity<Map<String, Object>> handleUpload(@RequestBody List<PickingItem> excelData) {
+    public ResponseEntity<?> handleUpload(@RequestBody List<PickingItem> pickingItems) {
+        List<PickingItem> sortedList = pickingItems.stream()
+                .sorted(Comparator.comparing(PickingItem::getPickingOrderNumber)
+                        .thenComparing(PickingItem::getItemNo)
+                        .thenComparing(PickingItem::getItemCode))
+                .collect(Collectors.toList());
 
-        try {
-            pickingItemRepository.saveAll(excelData);
+        pickingItemRepository.saveAll(sortedList);
 
-            return ResponseEntity.ok(Map.of(
-                    "message", "Data received successfully",
-                    "count", excelData.size()
-            ));
+        return ResponseEntity.ok(ApiResponse.success(Map.of(
+                "message", "Data received successfully",
+                "count", sortedList.size()
+        )));
 
-        }
-        catch (DataIntegrityViolationException  e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500)
-                    .body(Map.of("message", "duplicate upload"));
-        }catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500)
-                    .body(Map.of("message", e.getMessage()));
-        }
     }
 
 
     @PostMapping("/doubleWeekCheck")
-    @ResponseBody
-    public List<Map<String, Object>> doubleWeekCheck(@RequestBody List<String> skus) {
+    public ResponseEntity<?> doubleWeekCheck(@RequestBody List<String> skus) {
 
-        return oldestSkuService.getDoubleCheckList(skus);
+        return ResponseEntity.ok(ApiResponse.success(oldestSkuService.getDoubleCheckList(skus)));
     }
 
 }

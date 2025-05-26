@@ -11,8 +11,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -43,11 +43,11 @@ public class UserController {
 
 
     @GetMapping("/getDate")
-    public Map<String, Object> getDate() {
+    public ResponseEntity<?> getDate() {
         Map<String, Object> response = new HashMap<>();
         String date = userService.getDate();
         response.put("date", date);
-        return response;
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
 
@@ -57,8 +57,8 @@ public class UserController {
      * @return 包含用户列表
      */
     @GetMapping("/users")
-    public List<Map<String,Object>> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<?> getAllUsers() {
+        return ResponseEntity.ok(ApiResponse.success(userService.getAllUsers()));
     }
 
     /**
@@ -69,11 +69,11 @@ public class UserController {
      */
 
     @PostMapping("/addUser")
-    public Map<String,Object> createUser( @RequestBody Map<String,Object> userCreateDTO) {
+    public ResponseEntity<?> createUser(@RequestBody Map<String, Object> userCreateDTO) {
         UserDTO createdUser = userService.createUser(userCreateDTO);
         //todo 按照下面这行优化HttpStatus.CREATED
 //        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-        return Map.of();
+        return ResponseEntity.ok(ApiResponse.success(Map.of()));
     }
 
     /**
@@ -84,22 +84,22 @@ public class UserController {
      */
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Long userId) {
+    public ResponseEntity<?> getUserById(@PathVariable Long userId) {
         UserDTO user = userService.getUserById(userId);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(ApiResponse.success(user));
     }
 
     /**
      * 更新用户信息
      *
-     * @param userId        用户ID
+     * @param userId 用户ID
      * @return 包含更新后用户的 ResponseEntity
      */
 //
     @PostMapping("/users/{userId}")
-    public Map updateUser(@PathVariable Long userId, @RequestBody Map<String,Object> userData) {
-         userService.updateUser(userId, userData);
-        return Map.of();
+    public ResponseEntity<?> updateUser(@PathVariable Long userId, @RequestBody Map<String, Object> userData) {
+        userService.updateUser(userId, userData);
+        return ResponseEntity.ok(ApiResponse.success(Map.of()));
     }
 
     /**
@@ -110,14 +110,10 @@ public class UserController {
      */
 
     @GetMapping("/status/{userId}")
-    public Map<Object, Object> toggleUserStatus(@PathVariable Long userId) {
-        try{
-            UserDTO user = userService.toggleUserStatus(userId);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+    public ResponseEntity<?> toggleUserStatus(@PathVariable Long userId) {
+        userService.toggleUserStatus(userId);
 
-        return Map.of();
+        return ResponseEntity.ok(ApiResponse.success(Map.of()));
     }
 
     /**
@@ -128,7 +124,7 @@ public class UserController {
      */
 //
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }

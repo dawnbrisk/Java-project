@@ -45,6 +45,62 @@ public class PickingItem {
     @Column(name = "scan_time", nullable = false)
     private LocalDateTime scanTime;          // 扫码时间
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getPickingOrderNumber() {
+        return pickingOrderNumber;
+    }
+
+    public void setPickingOrderNumber(String pickingOrderNumber) {
+        this.pickingOrderNumber = pickingOrderNumber;
+    }
+
+    public int getItemNo() {
+        return itemNo;
+    }
+
+    public void setItemNo(int itemNo) {
+        this.itemNo = itemNo;
+    }
+
+    public String getItemCode() {
+        return itemCode;
+    }
+
+    public void setItemCode(String itemCode) {
+        this.itemCode = itemCode;
+    }
+
+    public String getOperatorAccount() {
+        return operatorAccount;
+    }
+
+    public void setOperatorAccount(String operatorAccount) {
+        this.operatorAccount = operatorAccount;
+    }
+
+    public Integer getGoodsQuantity() {
+        return goodsQuantity;
+    }
+
+    public void setGoodsQuantity(Integer goodsQuantity) {
+        this.goodsQuantity = goodsQuantity;
+    }
+
+    public LocalDateTime getScanTime() {
+        return scanTime;
+    }
+
+    public void setScanTime(LocalDateTime scanTime) {
+        this.scanTime = scanTime;
+    }
+
     @PrePersist
     public void generateId() {
 

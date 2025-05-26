@@ -1,8 +1,9 @@
 package com.blitz.springboot4.controller;
 
-import com.blitz.springboot4.entity.ApiResponse;
+
 import com.blitz.springboot4.entity.UpDownMove;
 import com.blitz.springboot4.service.UpDownMoveService;
+import com.blitz.springboot4.util.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,41 +27,38 @@ public class UpDownMoveController {
     }
 
     @PostMapping("/selectHistory")
-    public ResponseEntity<Map<String, Object>> selectHistory(@RequestBody Map<String, String> params) {
+    public ResponseEntity<?> selectHistory(@RequestBody Map<String, String> params) {
         Map<String, Object> response = new HashMap<>();
         response.put("result", upDownMoveService.selectUpDownMove(params.get("username"), params.get("status")));
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PostMapping("/deleteAction")
     public ResponseEntity<ApiResponse> deleteAction(@RequestBody Map<String, String> params) {
 
-
         int result = upDownMoveService.deleteUpDownMove(params.get("id"));
 
-        return ResponseEntity.ok(new ApiResponse(true, "delete successful", result));
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 
 
     @PostMapping("/ActionList")
-    public ResponseEntity<Map<String, Object>> ActionList(@RequestBody Map<String, Object> params) {
+    public ResponseEntity<?> ActionList(@RequestBody Map<String, Object> params) {
 
-        return ResponseEntity.ok(upDownMoveService.actionList(params));
+        return ResponseEntity.ok(ApiResponse.success(upDownMoveService.actionList(params)));
 
     }
 
 
     @GetMapping("/updownDetail")
-    @ResponseBody
     public List<Map<String, Object>> updownDetail() {
        return upDownMoveService.updownDetail();
     }
 
 
     @GetMapping("/AverageMovePerHour")
-    @ResponseBody
-    public List<Map<String, Object>> AverageMovePerHour() {
-        return upDownMoveService.averageMovePerHour();
+    public ResponseEntity<?> AverageMovePerHour() {
+        return ResponseEntity.ok(ApiResponse.success(upDownMoveService.averageMovePerHour()));
     }
 
 

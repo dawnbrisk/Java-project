@@ -44,9 +44,11 @@ public class JwtFilter extends OncePerRequestFilter {
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 // 提取 token
                 String token = authHeader.substring(7);
+                System.out.println("Token: " + token);
 
                 // 从 token 中提取用户名
                 String username = jwtUtil.extractUsername(token);
+                System.out.println("User: " + username);
 
                 // 如果用户名有效，且上下文中无已有认证信息
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
