@@ -50,11 +50,6 @@ public class UpDownMoveController {
     }
 
 
-    @GetMapping("/updownDetail")
-    public List<Map<String, Object>> updownDetail() {
-       return upDownMoveService.updownDetail();
-    }
-
 
     @GetMapping("/AverageMovePerHour")
     public ResponseEntity<?> AverageMovePerHour() {

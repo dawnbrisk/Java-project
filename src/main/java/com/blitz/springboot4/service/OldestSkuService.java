@@ -34,4 +34,9 @@ public class OldestSkuService {
         return oldestSkuMapper.getDoubleCheckList(itemCodes);
     }
 
+
+    public List<String> getPickingOrderNumber(String month){
+        return oldestSkuMapper.getPickingOrderNumber(month);
+    }
+
 }

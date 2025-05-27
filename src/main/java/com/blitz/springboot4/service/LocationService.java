@@ -140,7 +140,7 @@ public class LocationService {
 
             //current location insert
             originLocations.forEach(location -> {
-                locationMapper.insertLocations(CommonUtils.generateUUID(), sku, location.getLocationCode(), location.getPalletNumber(), "0", "0","1");
+                locationMapper.insertLocations(CommonUtils.generateUUID(), sku, location.getLocationCode(), location.getPalletNumber(), "0", "0", "1");
             });
 
             //steps
@@ -152,9 +152,9 @@ public class LocationService {
             for (WarehouseLocation location : locations) {
 
                 if (location.getPalletNumber() == 0) {
-                    locationMapper.insertLocations(CommonUtils.generateUUID(), sku, location.getLocationCode(), 0, "1", "1","1");
+                    locationMapper.insertLocations(CommonUtils.generateUUID(), sku, location.getLocationCode(), 0, "1", "1", "1");
                 } else {
-                    locationMapper.insertLocations(CommonUtils.generateUUID(), sku, location.getLocationCode(), location.getPalletNumber(), "1", "0","1");
+                    locationMapper.insertLocations(CommonUtils.generateUUID(), sku, location.getLocationCode(), location.getPalletNumber(), "1", "0", "1");
                 }
             }
         }
@@ -233,7 +233,7 @@ public class LocationService {
             List<String> dateRange = (List<String>) params.getOrDefault("dateRange", Collections.emptyList());
 
             if (!dateRange.isEmpty()) {
-                params.put("dateRange", "AND update_time BETWEEN '" + dateRange.get(0) + "'" + " AND '" + dateRange.get(1) + "'");
+                params.put("dateRange", "AND update_time BETWEEN '" + dateRange.get(0).substring(0, 19).replace("T", " ") + "'" + " AND '" + dateRange.get(1).substring(0, 19).replace("T", " ") + "'");
             } else {
                 params.put("dateRange", "");
             }
@@ -378,7 +378,7 @@ public class LocationService {
     }
 
 
-    public  List<Map<String,Object>> getMovingHistory() {
+    public List<Map<String, Object>> getMovingHistory() {
         return locationMapper.getMovingHistory();
     }
 }

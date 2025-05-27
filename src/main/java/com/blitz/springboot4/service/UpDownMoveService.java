@@ -67,9 +67,6 @@ public class UpDownMoveService {
     }
 
 
-    public List<Map<String,Object>> updownDetail() {
-        return upDownMoveMapper.updownDetail();
-    }
 
     public List<Map<String,Object>> averageMovePerHour() {
 

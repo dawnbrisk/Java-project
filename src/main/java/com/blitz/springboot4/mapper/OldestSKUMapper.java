@@ -60,4 +60,13 @@ public interface OldestSKUMapper {
     void insertIntoDoubleWeeksCheck(@Param("itemCodes") String itemCodes);
 
 
+    @Select("""
+                SELECT DISTINCT picking_order_number  
+                FROM picking_list 
+                WHERE picking_order_number LIKE CONCAT(#{month}, '%') 
+                ORDER BY picking_order_number
+            """)
+    List<String> getPickingOrderNumber(@Param("month") String month);
+
+
 }

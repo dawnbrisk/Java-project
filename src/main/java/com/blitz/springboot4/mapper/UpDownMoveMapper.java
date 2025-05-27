@@ -49,16 +49,6 @@ public interface UpDownMoveMapper {
         """)
     List<UpDownMove> selectActionListTotal(@Param("params") Map<String, Object> params);
 
-    @Select("""
-        SELECT
-            username,
-            DATE(insert_time) AS movement_date,
-            COUNT(*) AS total_movements
-        FROM up_down_move
-        GROUP BY username, movement_date
-        ORDER BY username, movement_date DESC
-        """)
-    List<Map<String, Object>> updownDetail();
 
     @Select("""
             SELECT

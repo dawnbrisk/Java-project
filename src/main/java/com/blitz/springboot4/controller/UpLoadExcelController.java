@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/api")
 public class UpLoadExcelController {
 
     @Autowired
@@ -106,6 +105,20 @@ public class UpLoadExcelController {
 
         return ResponseEntity.ok(ApiResponse.success(oldestSkuService.getDoubleCheckList(skus)));
     }
+
+    @PostMapping("/biweeklyList")
+    public ResponseEntity<?> biweeklyList() {
+        return ResponseEntity.ok(ApiResponse.success("Todo"));
+    }
+
+
+    @PostMapping("/month_picking")
+    public ResponseEntity<?> monthPicking(@RequestBody String month) {
+        month = month.replace("\"", "").replace("-","");
+        List<String> result = oldestSkuService.getPickingOrderNumber(month);  // 设置断点在这里
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
 
 }
 

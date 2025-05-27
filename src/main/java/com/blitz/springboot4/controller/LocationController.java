@@ -6,13 +6,12 @@ import com.blitz.springboot4.service.LocationServicePlus;
 import com.blitz.springboot4.util.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+
 
 
 
@@ -81,13 +80,8 @@ public class LocationController {
 
     @PostMapping("/getAllSteps")
     public ResponseEntity<?> getAllSteps(@RequestBody Map<String,Object> params) {
-       try {
-           return ResponseEntity.ok(ApiResponse.success(locationService.getAllSteps(params)));
-       }catch (Exception e){
-           e.printStackTrace();
-           return ResponseEntity.ok(ApiResponse.success(List.of()));
-       }
 
+           return ResponseEntity.ok(ApiResponse.success(locationService.getAllSteps(params)));
     }
 
 

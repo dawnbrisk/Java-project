@@ -17,18 +17,20 @@ public class PickingController {
 
     @GetMapping("/picking_detail")
     public ResponseEntity<?> pickingDetail() {
+
         return ResponseEntity.ok(ApiResponse.success(pickingService.getAllPickingHistory()));
     }
 
 
     @GetMapping("/pickingByAccount")
-    public ResponseEntity<?> pickingByAccount(@RequestParam("month") String month,
-                                                     @RequestParam("account") String account) {
+    public ResponseEntity<?> pickingByAccount(@RequestParam("month") String month,@RequestParam("account") String account) {
+
         return ResponseEntity.ok(ApiResponse.success(pickingService.getPickingHistoryByDay(account,month)));
     }
 
     @GetMapping("/averageInterval")
     public ResponseEntity<?> average(){
+
        return ResponseEntity.ok(ApiResponse.success(pickingService.getPickingHistoryByAccount()));
 
     }
