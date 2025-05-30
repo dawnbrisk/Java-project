@@ -7,6 +7,8 @@ public class Constants {
 
     public static final int MaxLength = 110;//在计算空库位时，有时一个SKU太长，会占据两个库位。该长度就是判断它是否会占用两个库位的标准
 
+    //token有效期
+    public static final long EXPIRATION_TIME = 10*60 * 60 * 1000;
 
     public static final String Tick = "1";
     public static final String NoTick = "0";

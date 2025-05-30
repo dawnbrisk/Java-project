@@ -4,22 +4,18 @@ import com.blitz.springboot4.dao.ItemsRepository;
 import com.blitz.springboot4.dao.PickingItemRepository;
 import com.blitz.springboot4.entity.Item;
 import com.blitz.springboot4.entity.PickingItem;
-import com.blitz.springboot4.service.LocationService;
-import com.blitz.springboot4.service.MergePalletService;
-import com.blitz.springboot4.service.OldestSkuService;
-import com.blitz.springboot4.service.SinglePalletService;
+import com.blitz.springboot4.service.*;
 import com.blitz.springboot4.util.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
 
 
 @RestController
@@ -28,8 +24,6 @@ public class UpLoadExcelController {
     @Autowired
     private ItemsRepository itemsRepository;
 
-    @Autowired
-    private PickingItemRepository pickingItemRepository;
 
     @Autowired
     private MergePalletService mergePalletService;
@@ -42,6 +36,10 @@ public class UpLoadExcelController {
 
     @Autowired
     private OldestSkuService oldestSkuService;
+
+
+    @Autowired
+    private UploadService uploadService;
 
 
     @PostMapping("/upload")
@@ -82,39 +80,27 @@ public class UpLoadExcelController {
     }
 
     @PostMapping("/uploadPickingList")
-    @Transactional
     public ResponseEntity<?> handleUpload(@RequestBody List<PickingItem> pickingItems) {
-        List<PickingItem> sortedList = pickingItems.stream()
-                .sorted(Comparator.comparing(PickingItem::getPickingOrderNumber)
-                        .thenComparing(PickingItem::getItemNo)
-                        .thenComparing(PickingItem::getItemCode))
-                .collect(Collectors.toList());
 
-        pickingItemRepository.saveAll(sortedList);
+        uploadService.handleUpload(pickingItems);
 
         return ResponseEntity.ok(ApiResponse.success(Map.of(
                 "message", "Data received successfully",
-                "count", sortedList.size()
+                "count", pickingItems.size()
         )));
 
+
     }
 
 
-    @PostMapping("/doubleWeekCheck")
-    public ResponseEntity<?> doubleWeekCheck(@RequestBody List<String> skus) {
 
-        return ResponseEntity.ok(ApiResponse.success(oldestSkuService.getDoubleCheckList(skus)));
-    }
 
-    @PostMapping("/biweeklyList")
-    public ResponseEntity<?> biweeklyList() {
-        return ResponseEntity.ok(ApiResponse.success("Todo"));
-    }
+
 
 
     @PostMapping("/month_picking")
     public ResponseEntity<?> monthPicking(@RequestBody String month) {
-        month = month.replace("\"", "").replace("-","");
+        month = month.replace("\"", "").replace("-", "");
         List<String> result = oldestSkuService.getPickingOrderNumber(month);  // 设置断点在这里
         return ResponseEntity.ok(ApiResponse.success(result));
     }

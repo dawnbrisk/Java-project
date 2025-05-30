@@ -2,7 +2,6 @@ package com.blitz.springboot4.mapper;
 
 
 import org.apache.ibatis.annotations.*;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -39,25 +38,11 @@ public interface OldestSKUMapper {
     List<Map<String, Object>> getOldestSKU2();
 
 
-    @Select("SELECT item_code,Location_Code,Pallet_Code,Current_Inventory_Qty FROM warehouse_items_newest WHERE item_code IN (${itemCodes})")
-    List<Map<String, Object>> getDoubleCheckList(@Param("itemCodes") String itemCodes);
 
 
-    /*
-    清空数据库表 double_weeks_check 中的所有数据
-     */
-    @Transactional
-    @Update("TRUNCATE TABLE double_weeks_check;")
-    void truncateDoubleWeeksCheck();
 
-    @Transactional
-    @Insert("""
-                INSERT INTO double_weeks_check (item_code, Location_Code, Pallet_Code, Current_Inventory_Qty, insert_time)
-                SELECT item_code, Location_Code, Pallet_Code, Current_Inventory_Qty, NOW()
-                FROM warehouse_items_newest
-                WHERE item_code IN (${itemCodes});
-            """)
-    void insertIntoDoubleWeeksCheck(@Param("itemCodes") String itemCodes);
+
+
 
 
     @Select("""

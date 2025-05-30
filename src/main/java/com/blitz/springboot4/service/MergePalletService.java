@@ -226,7 +226,7 @@ public class MergePalletService {
             List<String> dateRange = (List<String>) params.getOrDefault("dateRange", Collections.emptyList());
 
             if (!dateRange.isEmpty()) {
-                params.put("dateRange", "AND update_time BETWEEN '" + dateRange.get(0) + "'" + " AND '" + dateRange.get(1) + "'");
+                params.put("dateRange", "AND update_time BETWEEN '" + dateRange.get(0).substring(0, 19).replace("T", " ") + "'" + " AND '" + dateRange.get(1).substring(0, 19).replace("T", " ") + "'");
             } else {
                 params.put("dateRange", "");
             }

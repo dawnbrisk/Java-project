@@ -4,6 +4,8 @@ import com.blitz.springboot4.mapper.OldestSKUMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,15 +26,7 @@ public class OldestSkuService {
 
     }
 
-    public List<Map<String,Object>> getDoubleCheckList(List<String> skus){
 
-        String itemCodes = skus.stream()
-                .map(code -> "'" + code + "'")
-                .collect(Collectors.joining(","));
-                oldestSkuMapper.truncateDoubleWeeksCheck();
-                oldestSkuMapper.insertIntoDoubleWeeksCheck(itemCodes);
-        return oldestSkuMapper.getDoubleCheckList(itemCodes);
-    }
 
 
     public List<String> getPickingOrderNumber(String month){
