@@ -4,7 +4,12 @@ package com.blitz.springboot4.service;
 import com.blitz.springboot4.mapper.MergeMapper;
 import com.blitz.springboot4.util.CommonUtils;
 import com.blitz.springboot4.util.Constants;
+import com.blitz.springboot4.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +23,8 @@ public class MergePalletService {
     @Autowired
     private MergeMapper mergeMapper;
 
-
+    @Autowired
+    private AuthenticationManager authManager;
 
     public void mergePallet() {
 
@@ -234,6 +240,9 @@ public class MergePalletService {
         } else {
             params.put("dateRange", "");
         }
+        int page = Integer.parseInt(params.get("page").toString());
+        int pageSize = Integer.parseInt(params.get("pageSize").toString());
+        params.put("offset", (page - 1) * pageSize);
 
         return mergeMapper.getAllSteps(params);
     }
@@ -243,4 +252,29 @@ public class MergePalletService {
         return mergeMapper.getMergeStepsByUser();
     }
 
+
+    public boolean insertGeneralMergePallet(String acode,String bcode,String token){
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7); // 去除 "Bearer "
+        }
+        String id = acode+'+'+bcode;
+        // 尝试认证（会调用 UserDetailsService）
+        String username = new JwtTokenUtil().extractUsername(token);
+
+
+        return mergeMapper.insertMergedPallet(id,acode,bcode,username) ==1;
+    }
+
+
+    public void insertPalletPhoto(String mergeId,String relativePath){
+        mergeMapper.insertPalletPhoto(mergeId,relativePath);
+    }
+
+    public List<Map<String,Object>> generalMergeHistory(String token){
+
+        // 尝试认证（会调用 UserDetailsService）
+        String username = new JwtTokenUtil().extractUsername(token.substring(7));
+
+        return mergeMapper.generalMergeHistory(username);
+    }
 }
