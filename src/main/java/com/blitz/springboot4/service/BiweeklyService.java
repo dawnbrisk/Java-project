@@ -37,7 +37,7 @@ public class BiweeklyService {
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
         String itemCodes = skus.stream()
-                .map(code -> "'" + code + "'")
+                .map(code -> "'" + code.trim() + "'")
                 .collect(Collectors.joining(","));
         mapper.truncateDoubleWeeksCheck();
         mapper.insertIntoDoubleWeeksCheck(itemCodes,batchTime);
