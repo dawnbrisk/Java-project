@@ -98,8 +98,15 @@ public interface MergeMapper {
     List<Map<String, Object>> selectSkuPalletByLocation();
 
 
-    @Select("SELECT * from merge_steps where is_finish  <> '0'  ${name} ${dateRange}  ORDER BY update_time desc LIMIT #{offset}, #{pageSize}")
+    @Select("SELECT * from merge_steps where is_finish  <> '0'  ${name} ${dateRange}  ORDER BY update_time desc ")
     List<Map<String, Object>> getAllSteps(Map<String, Object> map);
+
+    @Select("SELECT * from merge_steps where is_finish  <> '0'  ${name} ${dateRange}  ORDER BY update_time desc LIMIT #{offset}, #{pageSize}")
+    List<Map<String, Object>> getAllStepsBypage(Map<String, Object> map);
+
+    @Select("select file_path from pallet_photos where merge_id = #{mergeId} limit 1")
+    String getPalletFile(String mergeId);
+
 
 
     @Select("""
@@ -158,10 +165,14 @@ public interface MergeMapper {
 
 
     @Insert("""
-                INSERT INTO pallet_photos ( merge_id, file_path,)
+                INSERT INTO pallet_photos ( merge_id, file_path)
                 VALUES ( #{mergeId}, #{filePath})
             """)
     void insertPalletPhoto(@Param("mergeId") String mergeId,@Param("filePath") String filePath);
+
+
+    @Select("SELECT count(*) as num  FROM `merge_steps` where from_pallet = #{fromPallet} and to_pallet = #{toPallet}  ")
+    int checkIfExist(String fromPallet,String toPallet);
 
 
 }

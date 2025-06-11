@@ -1,28 +1,34 @@
 package com.blitz.springboot4.controller;
 
 
+import com.blitz.springboot4.entity.GeneralMergeRequest;
 import com.blitz.springboot4.service.MergePalletService;
 import com.blitz.springboot4.util.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 
 @RestController
 public class MergeController {
 
     @Autowired
     public MergePalletService mergePalletService;
+
+
+    private static final String UPLOAD_DIR = "upload"; // 存储路径，相对于项目根目录
 
 
     @GetMapping("/MergePalletDetail/{sku}")
@@ -71,36 +77,74 @@ public class MergeController {
 
 
     @PostMapping("/generalMergePallets")
-    public ResponseEntity<?> insertGeneralMerge(@RequestParam String palletA_code,
-                                                @RequestParam String palletB_code,
-                                                @RequestParam("files") List<MultipartFile> files, @RequestHeader("Authorization") String token) throws IOException {
+    public ResponseEntity<?> insertGeneralMerge(@RequestBody GeneralMergeRequest request,
+                                                @RequestHeader("Authorization") String token) {
 
-        // 2. 保存图片到文件夹和数据库
-        String mergeId = palletA_code+"+"+palletB_code;
-        String saveDirPath = "src/main/resources/static/images/merge-pallets/" + mergeId;
-        File saveDir = new File(saveDirPath);
-        if (!saveDir.exists())
-            saveDir.mkdirs();
+        // 打印接收到的数据
 
-        for (MultipartFile file : files) {
-            if (!file.isEmpty()) {
-                String filename = System.currentTimeMillis() + "-" + file.getOriginalFilename();
-                File dest = new File(saveDir, filename);
-                file.transferTo(dest);
+        List<String> fileUrls = request.getFileUrls();
 
-                String relativePath = "/images/merge-pallets/" + mergeId + "/" + filename;
-
-                mergePalletService.insertPalletPhoto(mergeId,relativePath);
-            }
+        for (String url : fileUrls) {
+            String mergeId = request.getPalletA_code() + "+" + request.getPalletB_code();
+            mergePalletService.insertPalletPhoto(mergeId, url);
         }
 
-        return ResponseEntity.ok(ApiResponse.success(mergePalletService.insertGeneralMergePallet(palletA_code,palletB_code,token)));
+        mergePalletService.insertGeneralMergePallet(request.getPalletA_code(), request.getPalletB_code(), token);
+
+
+        return ResponseEntity.ok(ApiResponse.success("success"));
     }
 
 
     @PostMapping("/generalMergeHistory")
     public ResponseEntity<?> generalMergeHistory(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(ApiResponse.success(mergePalletService.generalMergeHistory(token)));
+    }
+
+    @PostMapping("/checkIfExist")
+    public ResponseEntity<?> checkIfExist(@RequestBody Map<String, Object> params) {
+        return ResponseEntity.ok(ApiResponse.success(mergePalletService.checkIfExist(params.get("fromPallet").toString(),params.get("toPallet").toString())));
+    }
+
+
+    @RestController
+    public class FileUploadController {
+
+        // 上传目录，支持通过配置文件或者环境变量注入
+        @Value("${upload.dir}")
+        private String uploadDir;
+
+        @PostMapping("/uploadFiles")
+        public ResponseEntity<?> uploadFiles(@RequestParam("files") List<MultipartFile> files) {
+            List<String> fileUrls = new ArrayList<>();
+            String today = LocalDate.now().toString();
+
+            // 构建当天上传目录路径
+            File uploadPath = new File(uploadDir + "/" + today);
+            if (!uploadPath.exists()) {
+                uploadPath.mkdirs();
+            }
+
+            for (MultipartFile file : files) {
+                if (file.isEmpty()) continue;
+
+                try {
+                    String originalFilename = file.getOriginalFilename();
+                    String newFileName = UUID.randomUUID() + "_" + originalFilename;
+                    Path filePath = Paths.get(uploadPath.getAbsolutePath(), newFileName);
+
+                    file.transferTo(filePath);
+
+                    // 构造访问URL（前端访问时需要配置静态资源映射）
+                    String fileUrl = "/uploads/" + today + "/" + newFileName;
+                    fileUrls.add(fileUrl);
+                } catch (IOException e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body(List.of("上传失败：" + file.getOriginalFilename()));
+                }
+            }
+            return ResponseEntity.ok(ApiResponse.success(fileUrls));
+        }
     }
 
 }

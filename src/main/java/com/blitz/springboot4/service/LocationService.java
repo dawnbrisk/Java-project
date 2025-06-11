@@ -221,7 +221,7 @@ public class LocationService {
     }
 
 
-    public List<Map<String, Object>> getAllSteps(Map<String, Object> params) {
+    public Map<String,Object> getAllSteps(Map<String, Object> params) {
 
 
         if (!params.get("name").toString().isEmpty()) {
@@ -242,8 +242,16 @@ public class LocationService {
             params.put("dateRange", "");
         }
 
+        int page = Integer.parseInt(params.get("page").toString());
+        int pageSize = Integer.parseInt(params.get("pageSize").toString());
+        params.put("offset", (page-1)*pageSize);
 
-        return locationMapper.getAllSteps(params);
+        Map<String,Object> result = new HashMap<>();
+        int total = locationMapper.getAllSteps(params).size();
+        result.put("total",total);
+        List<Map<String,Object>> data =  locationMapper.getStepsByPage(params);
+        result.put("data",data);
+        return result;
     }
 
 

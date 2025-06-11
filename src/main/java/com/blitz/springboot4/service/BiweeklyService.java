@@ -8,6 +8,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +35,7 @@ public class BiweeklyService {
 
 
     public List<Map<String,Object>> getDoubleCheckList(List<String> skus){
-        String batchTime = LocalDateTime.now()
+        String batchTime = ZonedDateTime.now(ZoneId.of("Europe/Berlin"))
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
         String itemCodes = skus.stream()

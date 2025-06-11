@@ -42,7 +42,7 @@ public class UpDownMoveController {
     }
 
 
-    @PostMapping("/ActionList")
+    @PostMapping("/actionList")
     public ResponseEntity<?> ActionList(@RequestBody Map<String, Object> params) {
 
         return ResponseEntity.ok(ApiResponse.success(upDownMoveService.actionList(params)));

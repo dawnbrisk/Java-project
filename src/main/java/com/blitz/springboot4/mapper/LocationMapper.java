@@ -203,8 +203,11 @@ public interface LocationMapper {
     List<Map<String, Object>> getHistory(String name);
 
 
-    @Select("SELECT * from moving_steps where isFinish is not null  ${name} ${dateRange}   ORDER BY update_time desc")
+    @Select("SELECT * from moving_steps where isFinish is not null  ${name} ${dateRange}   ORDER BY update_time desc ")
     List<Map<String, Object>> getAllSteps(Map<String, Object> map);
+
+    @Select("SELECT * from moving_steps where isFinish is not null  ${name} ${dateRange}   ORDER BY update_time desc LIMIT #{offset}, #{pageSize}")
+    List<Map<String, Object>> getStepsByPage(Map<String, Object> map);
 
 
     @Select("SELECT location , CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(location, '-', 3), '-', -1) AS UNSIGNED)  % 3  AS group_number     " +

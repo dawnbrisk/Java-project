@@ -221,7 +221,7 @@ public class MergePalletService {
     }
 
 
-    public List<Map<String,Object>> mergePalletHistory(Map<String, Object> params){
+    public Map<String,Object> mergePalletHistory(Map<String, Object> params){
 
         if (!params.get("name").toString().isEmpty()) {
             params.put("name", " AND user = '" + params.get("name").toString() + "'");
@@ -244,7 +244,19 @@ public class MergePalletService {
         int pageSize = Integer.parseInt(params.get("pageSize").toString());
         params.put("offset", (page - 1) * pageSize);
 
-        return mergeMapper.getAllSteps(params);
+        int total = mergeMapper.getAllSteps(params).size();
+        Map<String,Object> result = new HashMap<>();
+        result.put("total", total);
+        List<Map<String,Object>> steps = mergeMapper.getAllStepsBypage(params);
+        //完善steps
+        steps.forEach(step -> {
+            String filePath = mergeMapper.getPalletFile(step.get("from_pallet").toString()+"+"+step.get("to_pallet").toString());
+            step.put("filePath", filePath);
+        });
+        result.put("data", steps);
+
+
+        return result;
     }
 
 
@@ -257,7 +269,7 @@ public class MergePalletService {
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7); // 去除 "Bearer "
         }
-        String id = acode+'+'+bcode;
+        String id = acode+'+'+bcode+UUID.randomUUID();
         // 尝试认证（会调用 UserDetailsService）
         String username = new JwtTokenUtil().extractUsername(token);
 
@@ -276,5 +288,9 @@ public class MergePalletService {
         String username = new JwtTokenUtil().extractUsername(token.substring(7));
 
         return mergeMapper.generalMergeHistory(username);
+    }
+
+    public int checkIfExist(String fromPallet,String toPallet){
+        return mergeMapper.checkIfExist(fromPallet,toPallet);
     }
 }

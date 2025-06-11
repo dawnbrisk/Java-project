@@ -39,11 +39,14 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login").permitAll()
+                        .requestMatchers("/uploads/**").permitAll() // ✅ 放行静态资源访问
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 允许预检请求
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)
                 .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
+                    // 打印异常堆栈到控制台（开发调试用）
+                    authException.printStackTrace();
                     // ✅ 设置统一的 403 响应格式，并加 CORS 头
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
@@ -51,7 +54,10 @@ public class SecurityConfig {
                     response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
                     response.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
                     response.setContentType("application/json;charset=UTF-8");
-                    response.getWriter().write("{\"code\":403,\"message\":\"未登录或无权限\"}");
+                    // 返回异常消息给前端，方便调试（生产环境建议隐藏详细信息）
+                    String json = String.format("{\"code\":400,\"message\":\"%s\"}", "内部错误");
+                    response.getWriter().write(json);
+
                 }))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

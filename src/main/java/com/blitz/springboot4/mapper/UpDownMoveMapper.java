@@ -61,7 +61,7 @@ public interface UpDownMoveMapper {
                 FROM up_down_move
                 WHERE insert_time >= CURDATE() - INTERVAL 2 MONTH
             ) AS up_down_move
-            WHERE insert_time IS NOT NULL
+            WHERE insert_time IS NOT NULL and status != '0'
             GROUP BY trim(username), move_date, hour_slot
      	order by trim(username), move_date ,hour_slot
         """)
