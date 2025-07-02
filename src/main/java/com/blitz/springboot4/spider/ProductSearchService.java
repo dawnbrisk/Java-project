@@ -4,6 +4,7 @@ import com.blitz.springboot4.mapper.SpiderMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.failsafe.internal.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -36,6 +37,7 @@ public class ProductSearchService {
     //获取每个子目录下的列表
     public void categoryList() {
         List<String> categoryList = spiderMapper.getCategoryIds();
+        //List<String> categoryList =  List.of("10050");
 
         categoryList.forEach(categoryId -> {
             try {
@@ -55,10 +57,10 @@ public class ProductSearchService {
         headers.set("accept", "application/json, text/plain, */*");
         headers.set("origin", "https://www.gigab2b.com");
         headers.set("referer", "https://www.gigab2b.com/index.php?route=product/category&product_category_id=10015");
-        headers.set("x-csrf-token", "VT3ZUER0tbuB3w8IWdaemHTqK6QPVQku4CYNRuMo");
+        headers.set("x-csrf-token", "naYR9Auz9fDfNMvDrtmWvhSQ1S06uxPBekQ8NyBs");
         headers.set("x-requested-with", "XMLHttpRequest");
         headers.set("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0");
-        headers.set("cookie", "_ga=GA1.1.831586317.1747408221; _gcl_au=1.1.1088004216.1747408221; hubspotutk=d62e7b2b17e76df36ee4dc36c0d3f49c; __hs_opt_out=no; _fbp=fb.1.1747408226446.717849119989622286; gmd_device_id=a8f4ba04-2ec8-414e-85f0-9ee162902c4a; currency=USD; country=USA; tfstk=geoIpJv6R6fQNmZRFyvNfTJWT5qWQd-2RTw-nYIFekEdw_HY_XkEYe47WbNZYWkUv3gSij1zyuore9msGgSeteDRVurJgI-20vX3qud2GxU8c623EwKzw7ETx8zeXytM0vDhBgQpU2tVFl-0ZkF-wyUTX8NTpwh8JNp_e85dyMhJCdwzn6QdvJUOW8w427h82dMTs8E8pbE-NkXbFeNndpJNzqzfGJHL1gI-vU4QG77PVgg0dyi-p5MIdcwQRSa8YENEvfk-YD4MWNZoQqGSyjdN8W3bhfaqRIsIGX2-F8hBmtNtAYi_-VWVDAa7OVnL5TI-puFLr4GBOwVK8fa0BPBWmRl46vmK5LftpjPQvRUwDKMTyVo3oDROAo3mLku-MC7U9qwR4uj4GN-lPOacVRN2Cd_lrN1dGvHiqilQJR2Q7d9194fc2g7pCd1Kryegd5J6C63l.; acw_tc=ac11000117502321030721468e006db96077b787e1db75deae4cd1d3f60390; _ayo=670a7685d938a9eda27c77a965a3460b; OCSESSID=e3f093d0c39b91f882eb05de45; __hstc=114550104.d62e7b2b17e76df36ee4dc36c0d3f49c.1747408222805.1750172697649.1750232104035.23; __hssrc=1; acw_sc__v2=68526c2f05e7edc78f4587d549ca5b53f2950939; login_flag=1; is_partner=0; __hssc=114550104.3.1750232104035; _ga_39N4BF4XSG=GS2.1.s1750232103$o23$g1$t1750232135$j28$l0$h0");
+        headers.set("cookie", "_ga=GA1.1.831586317.1747408221; _gcl_au=1.1.1088004216.1747408221; hubspotutk=d62e7b2b17e76df36ee4dc36c0d3f49c; __hs_opt_out=no; _fbp=fb.1.1747408226446.717849119989622286; gmd_device_id=a8f4ba04-2ec8-414e-85f0-9ee162902c4a; country=USA; _ayo=8a4ec2c94bd8c10db7bf2420560360ff; OCSESSID=8df2ac81bbf6a742d78b295e66; __hstc=114550104.d62e7b2b17e76df36ee4dc36c0d3f49c.1747408222805.1751291892368.1751356283770.53; __hssrc=1; login_flag=1; is_partner=0; currency=EUR; tfstk=g8YqplD14q34QWWAmU_aUeUCDR_A5NkIgF61sCAGGtX0lrwM4pv2hjnOjG-yILIfnnO1_PRAFO915F-87Bd9ljQsMZdAWNDId2TwMIQO6xN5OEPlq6RuSPbiVamjiak-d2gBiBCI5IkB5xBs6tfGSsjGm8cP167GirvGEgfhO-bMIdjuEs13oRjcizAle1bGIdbiaQXR_NXiNFRDsz5CmfhuYc7ILTsVKIXz8LLPiErvgTygIUJC094NUP4MzsRNWTo_8c6HvtsCKL07uNRl_LSB0vz2QCApjg8anj9HEhJGw3Hab9-MGHL525qDaFWVxEjzTzAlP1vGb3HURs7X4M82Dfekip62xZd_TxOPY3SdZgVamZtBOFIHoqydFMCwUMtqLrJh4qwOZ3OvWnygbifRa9GrafO4k3FRcE47XlIlJ_WIGsZgjJUNa9GfGlEOq6CPdj1f.; __hssc=114550104.24.1751356283770; acw_tc=ac11000117513599708897974e00e4801e44a86f6e13b7a5cd225a01f95abf; acw_sc__v2=6863a1ebcc0b2e161a4d74cbb59257d9ea33a00d; _ga_39N4BF4XSG=GS2.1.s1751356282$o52$g1$t1751360002$j38$l0$h0");
 
         return headers;
     }
@@ -79,7 +81,7 @@ public class ProductSearchService {
                     "dimension_type": 1,
                     "scene": 2,
                     "sort": "first_available",
-                    "order": "asc",
+                    "order": "desc",
                     "product_category_id": [%s]
                 }
                 """, limit, categoryId);
@@ -119,7 +121,7 @@ public class ProductSearchService {
                             "dimension_type": 1,
                             "scene": 2,
                             "sort": "first_available",
-                            "order": "asc",
+                            "order": "desc",
                             "product_category_id": [%s]
                         }
                         """, page, limit, categoryId);

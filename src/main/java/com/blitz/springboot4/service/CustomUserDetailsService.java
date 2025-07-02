@@ -18,7 +18,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
         UserEntity user = userRepo.findByName(username)
-                .orElseThrow(() -> new UsernameNotFoundException("用户不存在"));
+                .orElseThrow(() -> new UsernameNotFoundException("the user is not found"));
         return new org.springframework.security.core.userdetails.User(
                 user.getName(), user.getPassword(), List.of());
     }

@@ -1,12 +1,10 @@
 package com.blitz.springboot4.mapper;
 
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface SpiderMapper {
@@ -38,4 +36,27 @@ public interface SpiderMapper {
         select distinct category_id from spider_category_ids group by category_id
     """)
     List<String> getCategoryIds();
+
+    @Select("""
+            SELECT  SKU ,count(*) as qty  from retour GROUP BY sku
+            """)
+    List<Map<String,Object>> getRetour();
+
+
+    @Select("""
+    SELECT   * from spider_sub_sku
+    """)
+    List<Map<String,Object>> getSubSku();
+
+
+    @Insert("""
+        insert into compare_result (main_sku,qty, sub_sku,required_qty,is_set) values (#{mainSku},#{qty},#{subSKU},#{requiredQty},'Y')
+    """)
+    void insertCompareResult(String mainSku,int qty,String subSKU,int requiredQty);
+
+    @Delete(" delete from compare_result")
+    void deleteCompareResult();
+
+    @Update(" update retour set is_used = 'Y' where is_used is null and sku = #{sku} limit #{qtyLimit}")
+    void  updateIsUsed(String sku,int qtyLimit);
 }

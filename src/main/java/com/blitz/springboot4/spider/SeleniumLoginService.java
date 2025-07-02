@@ -61,11 +61,11 @@ public class SeleniumLoginService {
 
         WebElement emailInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
                 By.xpath("//input[@placeholder='Email']")));
-        emailInput.sendKeys("demo@buyer.com");
+        emailInput.sendKeys("demodeu@test.com");
 
         WebElement passwordInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
                 By.xpath("//input[@placeholder='Password']")));
-        passwordInput.sendKeys("!u67q12dM");
+        passwordInput.sendKeys("ASD@@0514bnm");
 
         WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//button[contains(text(), 'Login Now')]")));

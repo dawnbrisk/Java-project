@@ -10,12 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -89,10 +87,14 @@ public class MergeController {
             mergePalletService.insertPalletPhoto(mergeId, url);
         }
 
-        mergePalletService.insertGeneralMergePallet(request.getPalletA_code(), request.getPalletB_code(), token);
-
-
-        return ResponseEntity.ok(ApiResponse.success("success"));
+        try {
+            boolean result = mergePalletService.insertGeneralMergePallet(request.getPalletA_code(), request.getPalletB_code(), token);
+            System.out.println("---------------------------------");
+            return ResponseEntity.ok(ApiResponse.success(result));
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.ok(ApiResponse.success("error"));
+        }
     }
 
 
@@ -103,48 +105,45 @@ public class MergeController {
 
     @PostMapping("/checkIfExist")
     public ResponseEntity<?> checkIfExist(@RequestBody Map<String, Object> params) {
-        return ResponseEntity.ok(ApiResponse.success(mergePalletService.checkIfExist(params.get("fromPallet").toString(),params.get("toPallet").toString())));
+        return ResponseEntity.ok(ApiResponse.success(mergePalletService.checkIfExist(params.get("fromPallet").toString(), params.get("toPallet").toString())));
     }
 
 
-    @RestController
-    public class FileUploadController {
+    // 上传目录，支持通过配置文件或者环境变量注入
+    @Value("${upload.dir}")
+    private String uploadDir;
 
-        // 上传目录，支持通过配置文件或者环境变量注入
-        @Value("${upload.dir}")
-        private String uploadDir;
+    @PostMapping("/uploadFiles")
+    public ResponseEntity<?> uploadFiles(@RequestParam("files") List<MultipartFile> files) {
+        List<String> fileUrls = new ArrayList<>();
+        String today = LocalDate.now().toString();
 
-        @PostMapping("/uploadFiles")
-        public ResponseEntity<?> uploadFiles(@RequestParam("files") List<MultipartFile> files) {
-            List<String> fileUrls = new ArrayList<>();
-            String today = LocalDate.now().toString();
-
-            // 构建当天上传目录路径
-            File uploadPath = new File(uploadDir + "/" + today);
-            if (!uploadPath.exists()) {
-                uploadPath.mkdirs();
-            }
-
-            for (MultipartFile file : files) {
-                if (file.isEmpty()) continue;
-
-                try {
-                    String originalFilename = file.getOriginalFilename();
-                    String newFileName = UUID.randomUUID() + "_" + originalFilename;
-                    Path filePath = Paths.get(uploadPath.getAbsolutePath(), newFileName);
-
-                    file.transferTo(filePath);
-
-                    // 构造访问URL（前端访问时需要配置静态资源映射）
-                    String fileUrl = "/uploads/" + today + "/" + newFileName;
-                    fileUrls.add(fileUrl);
-                } catch (IOException e) {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body(List.of("上传失败：" + file.getOriginalFilename()));
-                }
-            }
-            return ResponseEntity.ok(ApiResponse.success(fileUrls));
+        // 构建当天上传目录路径
+        File uploadPath = new File(uploadDir + "/" + today);
+        if (!uploadPath.exists()) {
+            uploadPath.mkdirs();
         }
+
+        for (MultipartFile file : files) {
+            if (file.isEmpty()) continue;
+
+            try {
+                String originalFilename = file.getOriginalFilename();
+                String newFileName = UUID.randomUUID() + "_" + originalFilename;
+                Path filePath = Paths.get(uploadPath.getAbsolutePath(), newFileName);
+
+                file.transferTo(filePath);
+
+                // 构造访问URL（前端访问时需要配置静态资源映射）
+                String fileUrl = "/uploads/" + today + "/" + newFileName;
+                fileUrls.add(fileUrl);
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(List.of("上传失败：" + file.getOriginalFilename()));
+            }
+        }
+        return ResponseEntity.ok(ApiResponse.success(fileUrls));
     }
+
 
 }
