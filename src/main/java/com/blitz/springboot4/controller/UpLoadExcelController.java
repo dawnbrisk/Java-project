@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
+import java.sql.SQLTransactionRollbackException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,7 +84,11 @@ public class UpLoadExcelController {
     @PostMapping("/uploadPickingList")
     public ResponseEntity<?> handleUpload(@RequestBody List<PickingItem> pickingItems) {
 
-        uploadService.handleUpload(pickingItems);
+        try {
+            uploadService.handleUpload(pickingItems);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return ResponseEntity.ok(ApiResponse.success(Map.of(
                 "message", "Data received successfully",
